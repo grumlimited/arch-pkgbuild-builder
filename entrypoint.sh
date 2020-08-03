@@ -50,9 +50,9 @@ case $target in
         namcap PKGBUILD
         install_deps
         makepkg --syncdeps --noconfirm
-        namcap "${pkgname}"-*
-        pacman -Qip "${pkgname}"-*.xz
-        pacman -Qlp "${pkgname}"-*.xz
+        namcap ${pkgname}-*
+        pacman -Qip ${pkgname}-*
+        pacman -Qlp ${pkgname}-*
         ;;
     run)
         install_deps
