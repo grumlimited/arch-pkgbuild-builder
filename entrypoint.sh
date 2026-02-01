@@ -34,10 +34,12 @@ if [[ ! -e $pkgbuild_dir/.SRCINFO ]]; then
     exit 1
 fi
 
+pwd
+whoami
 getfacl -p -R "$pkgbuild_dir" /github/home > /tmp/arch-pkgbuild-builder-permissions.bak
 
 # '/github/workspace' is mounted as a volume and has owner set to root
-# set the owner of $pkgbuild_dir  to the 'build' user, so it can access package files.
+ set the owner of $pkgbuild_dir  to the 'build' user, so it can access package files.
 sudo chown -R build "$pkgbuild_dir"
 
 # needs permissions so '/github/home/.config/yay' is accessible by yay
@@ -50,6 +52,8 @@ echo "keyserver hkp://keyserver.ubuntu.com:80" | tee /github/home/.gnupg/gpg.con
 cd "$pkgbuild_dir"
 
 pkgname=$(grep -E 'pkgname' .SRCINFO | sed -e 's/.*= //')
+
+yay -S --noconfirm --needed pacman-contrib
 
 install_deps() {
     # install all package dependencies
@@ -83,12 +87,17 @@ case $target in
         makepkg --syncdeps --noconfirm --install
         eval "$command"
         ;;
+    updpkgsums)
+        install_deps
+        fetch_gpg_keys
+        updpkgsums
+        ;;
     srcinfo)
         makepkg --printsrcinfo | diff --ignore-blank-lines .SRCINFO - || \
             { echo ".SRCINFO is out of sync. Please run 'makepkg --printsrcinfo' and commit the changes."; false; }
         ;;
     *)
-      echo "Target should be one of 'pkgbuild', 'srcinfo', 'run'" ;;
+      echo "Target should be one of 'pkgbuild', 'srcinfo', 'run', 'updpkgsums'" ;;
 esac
 
 sudo setfacl --restore=/tmp/arch-pkgbuild-builder-permissions.bak

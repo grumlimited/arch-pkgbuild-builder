@@ -14,7 +14,7 @@ inputs:
   target:
     description: >-
       Validation target.
-      Can be one of: "pkgbuild", "srcinfo", "run"
+      Can be one of: "pkgbuild", "srcinfo", "run", "updpkgsums"
     required: true
     default: 'pkgbuild'
   command:
